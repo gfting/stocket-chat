@@ -16,7 +16,8 @@ io.on('connection', (socket) => {
     });
 
     socket.on('chat message', (msg) => {
-        console.log('message: ' + msg);
+        console.log(`Nickname: ${msg.nickname}`)
+        console.log(`Message: ${msg.message}`)
         io.emit('chat message', msg);
     });
 });
