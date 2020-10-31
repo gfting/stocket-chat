@@ -28,13 +28,20 @@
             
             return false;
         });
-        socket.on('chat message', function(msg){
+        
+        socket.on('chat message', function(msg) {
             $('#messages').append($('<li>').text(`${msg.nickname}: ${msg.message}`));
         });
-        socket.on('user connected', function(){
+
+        socket.on('ticker data', function(tickerData) {
+            $('#messages').append($('<li>').text(`$${tickerData.symbol}$: ${tickerData.price}`));
+        });
+
+        socket.on('user connected', function() {
             $('#messages').append($('<li>').text("A user connected."));
         });
-        socket.on('user disconnected', function(){
+
+        socket.on('user disconnected', function() {
             $('#messages').append($('<li>').text("A user disconnected."));
         });
     });

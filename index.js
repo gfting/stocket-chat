@@ -6,6 +6,17 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
 
+// Finds values between $ $
+function findTickerSymbols(text) {
+    const regex = /(?<=\$)(.*?)(?=\$)/;
+    return regex.exec(text)
+}
+
+const tickerData = {
+    AAPL: 120.93,
+    AMZN: 1300.00
+}
+
 io.on('connection', (socket) => {
     console.log('a user connected');
     io.emit('user connected')
@@ -19,6 +30,14 @@ io.on('connection', (socket) => {
         console.log(`Nickname: ${msg.nickname}`)
         console.log(`Message: ${msg.message}`)
         io.emit('chat message', msg);
+        const tickerQueries = findTickerSymbols(msg.message)
+        
+        if (tickerQueries.length > 0 && tickerData[tickerQueries[0]]) {
+            const symbol = tickerQueries[0]
+            console.log(`Symbol: ${symbol}, Price: ${tickerData[symbol]}`)
+            io.emit('ticker data', {symbol: symbol, price: tickerData[symbol]})
+        }
+        
     });
 });
 
