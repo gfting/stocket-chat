@@ -17,7 +17,11 @@ const tickerData = {
     AMZN: 1300.00
 }
 
+// Make a mock database of users
+const users = {}
+
 io.on('connection', (socket) => {
+    // console.log(socket.id)
     console.log('a user connected');
     io.emit('user connected')
 
@@ -27,17 +31,37 @@ io.on('connection', (socket) => {
     });
 
     socket.on('chat message', (msg) => {
+
+        // Uses @ as a flag for a private message
+        if (msg.message[0] === "@") {
+            const msgArr = msg.message.split(' ')
+            const username = msgArr[0].substr(1, msgArr[0].length - 1)
+            // Checks if exists in DB, sends it as a private message
+            if (username in users) {
+                io.to(users[username]).emit('private message', msg);
+
+                // Send it back to itself
+                // TODO: This is hacky, needs to be refactored if actual project 
+                io.to(socket.id).emit('private message', msg)
+            }
+            return;
+        }
+
+        // Capture and store nickname
         console.log(`Nickname: ${msg.nickname}`)
+        users[msg.nickname] = socket.id
+
         console.log(`Message: ${msg.message}`)
         io.emit('chat message', msg);
+
+        // Handle ticker logic
         const tickerQueries = findTickerSymbols(msg.message)
         
-        if (tickerQueries.length > 0 && tickerData[tickerQueries[0]]) {
+        if (tickerQueries > 0 && tickerData[tickerQueries[0]]) {
             const symbol = tickerQueries[0]
             console.log(`Symbol: ${symbol}, Price: ${tickerData[symbol]}`)
             io.emit('ticker data', {symbol: symbol, price: tickerData[symbol]})
         }
-        
     });
 });
 
