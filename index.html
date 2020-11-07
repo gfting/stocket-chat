@@ -45,8 +45,8 @@
             $('#messages').append($('<li>').text("A user connected."));
         });
 
-        socket.on('user disconnected', function() {
-            $('#messages').append($('<li>').text("A user disconnected."));
+        socket.on('user disconnected', function(username) {
+            $('#messages').append($('<li>').text(`${username} disconnected.`));
         });
     });
     </script>

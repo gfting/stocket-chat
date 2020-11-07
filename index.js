@@ -20,14 +20,23 @@ const tickerData = {
 // Make a mock database of users
 const users = {}
 
+const socketsToUsers = {}
+
 io.on('connection', (socket) => {
     // console.log(socket.id)
     console.log('a user connected');
+
     io.emit('user connected')
 
     socket.on('disconnect', () => {
-        console.log('user disconnected');
-        io.emit('user disconnected')
+        if (socket.id in socketsToUsers) {
+            console.log('user disconnected');
+            console.log(socketsToUsers[socket.id])
+            io.emit('user disconnected', `${socketsToUsers[socket.id]}`)
+        } else {
+            console.log('user disconnected');
+            io.emit('user disconnected', 'A user')
+        }
     });
 
     socket.on('chat message', (msg) => {
@@ -53,6 +62,8 @@ io.on('connection', (socket) => {
         // Capture and store nickname
         console.log(`Nickname: ${msg.nickname}`)
         users[msg.nickname] = socket.id
+
+        socketsToUsers[socket.id] = msg.nickname
 
         console.log(`Message: ${msg.message}`)
         io.emit('chat message', msg);
