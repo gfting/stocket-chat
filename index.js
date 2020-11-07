@@ -43,6 +43,9 @@ io.on('connection', (socket) => {
                 // Send it back to itself
                 // TODO: This is hacky, needs to be refactored if actual project 
                 io.to(socket.id).emit('private message', msg)
+            } else {
+                const errorObject = {nickname: msg.nickname, message: `${username} is not a valid username.`}
+                io.to(socket.id).emit('private message', errorObject)
             }
             return;
         }
