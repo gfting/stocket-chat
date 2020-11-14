@@ -2,6 +2,7 @@ const app = require('express')();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 
+// Serve static HTML file
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
@@ -12,6 +13,7 @@ function findTickerSymbols(text) {
     return regex.exec(text)
 }
 
+// Store basic ticker data
 const tickerData = {
     AAPL: 120.93,
     AMZN: 1300.00
@@ -19,7 +21,6 @@ const tickerData = {
 
 // Make a mock database of users
 const users = {}
-
 const socketsToUsers = {}
 
 io.on('connection', (socket) => {
@@ -35,7 +36,7 @@ io.on('connection', (socket) => {
             io.emit('user disconnected', `${socketsToUsers[socket.id]}`)
         } else {
             console.log('user disconnected');
-            io.emit('user disconnected', 'A user')
+            io.emit('user disconnected', 'a user')
         }
     });
 
@@ -45,6 +46,7 @@ io.on('connection', (socket) => {
         if (msg.message[0] === "@") {
             const msgArr = msg.message.split(' ')
             const username = msgArr[0].substr(1, msgArr[0].length - 1)
+            console.log(users)
             // Checks if exists in DB, sends it as a private message
             if (username in users) {
                 io.to(users[username]).emit('private message', msg);
