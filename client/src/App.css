@@ -94,10 +94,6 @@ form button {
   flex-direction: column;
 }
 
-.header {
-
-}
-
 #privateInput {
   grid-area: privateInput;
 }
@@ -108,10 +104,16 @@ form button {
 
 .chats {
   display: grid;
+  flex-grow: 2;
   grid-template-columns: 50% 50%;
-  grid-template-rows: 80% 20%;
+  grid-template-rows: 90% 10%;
   grid-template-areas: 
     "privateChat allChat"
     "privateInput allInput";
 }
 
+.chatInput {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
