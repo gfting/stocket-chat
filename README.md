@@ -23,6 +23,8 @@ chat about stocks with socket
 # Reactify
 - Make everything React
 - Estimate: <1 session with current amount of code 
+- Interaction with server
+  - Frontend needs to make requests to new backend URL via CORS
 
 # Stock stuff
 - Parse chats to handle tickers, output data
