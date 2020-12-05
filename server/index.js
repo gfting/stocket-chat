@@ -1,13 +1,23 @@
 require('dotenv').config()
-
-const app = require('express')();
+const express = require('express');
+const app = express();
 const server = require('http').createServer(app);
-const io = require('socket.io')(server);
+const io = require('socket.io')(server, {cors: true, 
+    origin: process.env.ORIGIN,
+    methods: ["GET", "POST"]
+  });
 
-// Serve static HTML file
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
+io.set('origins', '*:*');
+const router = express.Router();
+
+router.get("/", (req, res) => {
+  res.send({ response: "I am alive" }).status(200);
 });
+
+// // Serve static HTML file
+// app.get('/', (req, res) => {
+//     res.sendFile(__dirname + '/index.html');
+// });
 
 // Finds values between $ $
 function findTickerSymbols(text) {
@@ -81,6 +91,10 @@ io.on('connection', (socket) => {
             io.emit('ticker data', {symbol: symbol, price: tickerData[symbol]})
         }
     });
+
+    socket.on('hi', (msg) => {
+        console.log(msg)
+    })
 });
 
 // Start the server on port 3000

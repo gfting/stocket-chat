@@ -1,12 +1,12 @@
 import logo from './logo.svg';
 import './App.css';
-import io from 'socket.io-client';
+import {io} from 'socket.io-client';
 import TextField from '@material-ui/core/TextField'
 import {Input} from 'theme-ui'
 import { Button, Heading } from 'theme-ui'
-// TODO: Change to prod URL
-const socket = io();
+import {useEffect} from 'react'
 
+const {REACT_APP_SERVER_URL} = process.env
 
 /**
  * // Grid proportions:
@@ -25,7 +25,7 @@ const socket = io();
 
 export const ChatInput = ({chatType, inputType}) => {
   return (
-    <div id={inputType} class="chatInput">
+    <div id={inputType} className="chatInput">
       <Input 
       style={{width: "80%", marginRight: "10px"}}
       placeholder="Type message here..."
@@ -37,6 +37,27 @@ export const ChatInput = ({chatType, inputType}) => {
 }
 
 export const App = () => {
+  useEffect(() => {
+    const socket = io(REACT_APP_SERVER_URL);
+    console.log(socket)
+
+    socket.emit('hi', () => {
+      console.log("emitting")
+      return "hello"
+    })
+
+    console.log(socket.id); // undefined
+
+    socket.on('connection', () => {
+      console.log(socket.id); // 'G5p5...'
+    });
+
+    socket.on('connection', () => {
+      console.log(socket.connected); // true
+    });
+    return () => socket.disconnect();
+  }, [])
+  
   return (
     <div className="container">
       <div className="header chatInput" style={{marginTop: "15px", justifyContent: "space-evenly", height: "auto"}}>
