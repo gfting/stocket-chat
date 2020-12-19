@@ -2,7 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import {io} from 'socket.io-client';
 import TextField from '@material-ui/core/TextField'
-import {Input} from 'theme-ui'
+import {Input, Box} from 'theme-ui'
 import { Button, Heading } from 'theme-ui'
 import {useEffect, useState} from 'react'
 
@@ -25,22 +25,35 @@ const {REACT_APP_SERVER_URL} = process.env
       - Send buttons, text buttons
  */
 
-export const ChatInput = ({chatType, inputType}) => {
+export const ChatInput = ({chatType, inputType, clickHandler, changeHandler}) => {
   return (
     <div id={inputType} className="chatInput">
       <Input 
       style={{width: "80%", marginRight: "10px"}}
       placeholder="Type message here..."
+      onChange={(e) => {changeHandler(e.target.value)}}
       />
-      <Button>Send</Button>
+      <Button onClick={(e) => {clickHandler(chatType)}}>Send</Button>
     </div>
-    
+  )
+}
+
+const Message = ({msgObj}) => {
+  console.log(msgObj.message)
+  return (
+    <div id={msgObj.message}>
+      {msgObj.message}
+    </div>
   )
 }
 
 export const App = () => {
   const [id, setId] = useState('');
+  const [nickname, setNickname] = useState('');
+  const [privateMsg, setPrivateMsg] = useState('');
+  const [publicMsg, setPublicMsg] = useState('');
   const [socket] = useSocket(REACT_APP_SERVER_URL);
+  const messages = []
 
   // const [socket, setSocket] = useState(io(REACT_APP_SERVER_URL));
 
@@ -54,22 +67,35 @@ export const App = () => {
     socket.emit("hi", { name: "John" });
   }, [])
 
-  const handleConnect = () => {
+  useEffect(() => {
+    
+    socket.on('chat message', (msg) => {
+      messages.push(msg)
+    })
+  })
 
+  const sendMessage = (chatType) => {
+    
+    const msgToSend = privateMsg ? chatType === "privateChat" : publicMsg;
+    socket.emit('chat message', { message: msgToSend, nickname: nickname } )
   }
+
+  const MessagesList = () => (messages.map(msg => (<Message msgObj={msg} />)))
   
   return (
     <div className="container">
       <div className="header chatInput" style={{marginTop: "15px", justifyContent: "space-evenly", height: "auto"}}>
         <Heading>Private</Heading>
-        <Input style={{width: "20%"}} placeholder="Enter nickname"/>
+        <Input style={{width: "20%"}} onChange={(e) => {setNickname(e.target.value)}} placeholder="Enter nickname"/>
         <Heading>Public</Heading>
       </div>
       <div className="chats">
-        <ChatInput chatType="privateChat"
-        inputType="privateInput" />
-        <ChatInput chatType="allChat" inputType="allInput" />
+        <Box id="messagesBox">
+          <MessagesList />
+        </Box>
 
+        <ChatInput chatType="privateChat" inputType="privateInput" changeHandler={setPrivateMsg} clickHandler={sendMessage}/>
+        <ChatInput chatType="allChat" inputType="allInput" clickHandler={sendMessage} changeHandler={setPublicMsg} />
       </div>
     </div>
   )
