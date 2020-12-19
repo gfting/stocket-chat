@@ -4,7 +4,9 @@ import {io} from 'socket.io-client';
 import TextField from '@material-ui/core/TextField'
 import {Input} from 'theme-ui'
 import { Button, Heading } from 'theme-ui'
-import {useEffect} from 'react'
+import {useEffect, useState} from 'react'
+
+import useSocket from 'use-socket.io-client';
 
 const {REACT_APP_SERVER_URL} = process.env
 
@@ -37,26 +39,24 @@ export const ChatInput = ({chatType, inputType}) => {
 }
 
 export const App = () => {
+  const [id, setId] = useState('');
+  const [socket] = useSocket(REACT_APP_SERVER_URL);
+
+  // const [socket, setSocket] = useState(io(REACT_APP_SERVER_URL));
+
   useEffect(() => {
-    const socket = io(REACT_APP_SERVER_URL);
-    console.log(socket)
+    socket.connect();
 
-    socket.emit('hi', () => {
-      console.log("emitting")
-      return "hello"
-    })
-
-    console.log(socket.id); // undefined
-
-    socket.on('connection', () => {
+    socket.on('connect', () => {
       console.log(socket.id); // 'G5p5...'
     });
 
-    socket.on('connection', () => {
-      console.log(socket.connected); // true
-    });
-    return () => socket.disconnect();
+    socket.emit("hi", { name: "John" });
   }, [])
+
+  const handleConnect = () => {
+
+  }
   
   return (
     <div className="container">

@@ -5,7 +5,7 @@ const server = require('http').createServer(app);
 const io = require('socket.io')(server, {cors: true, 
     origin: process.env.ORIGIN,
     methods: ["GET", "POST"]
-  });
+});
 
 io.set('origins', '*:*');
 const router = express.Router();
