@@ -2,8 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import {io} from 'socket.io-client';
 import TextField from '@material-ui/core/TextField'
-import {Input, Container} from 'theme-ui'
-import { Button, Heading } from 'theme-ui'
+import { Input, Container, Button, Heading, Text } from 'theme-ui'
 import {useEffect, useState} from 'react'
 import { v4 as uuidv4 } from 'uuid';
 
@@ -27,12 +26,18 @@ const {REACT_APP_SERVER_URL} = process.env
  */
 
 export const ChatInput = ({chatType, inputType, clickHandler, changeHandler}) => {
+
   return (
     <div id={inputType} className="chatInput">
       <Input 
       style={{width: "80%", marginRight: "10px"}}
       placeholder="Type message here..."
       onChange={(e) => {changeHandler(e.target.value)}}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          clickHandler(chatType)
+        }}
+      }
       />
       <Button onClick={(e) => {clickHandler(chatType)}}>Send</Button>
     </div>
@@ -47,7 +52,13 @@ export const ChatInput = ({chatType, inputType, clickHandler, changeHandler}) =>
 const Message = ({msgObj}) => {
   return (
     <div>
-      {`${msgObj.nickname}: ${msgObj.message}`}
+      <Text
+        sx={{
+          fontWeight: 'bold',
+        }}>
+        {msgObj.nickname}
+      </Text>
+      <Text>{msgObj.message}</Text>
     </div>
   )
 }
@@ -58,7 +69,8 @@ export const App = () => {
   const [privateMsg, setPrivateMsg] = useState('');
   const [publicMsg, setPublicMsg] = useState('');
   const [socket] = useSocket(REACT_APP_SERVER_URL);
-  const [messages, setMessages] = useState([])
+  const [privateMessages, setPrivateMessages] = useState([])
+  const [publicMessages, setPublicMessages] = useState([])
 
   // const [socket, setSocket] = useState(io(REACT_APP_SERVER_URL));
 
@@ -69,8 +81,12 @@ export const App = () => {
       console.log(`Connected; socket ID: ${socket.id}`); // 'G5p5...'
     });
 
-    socket.on('chat message', (msgObj) => {
-      setMessages(prevMessages => [...prevMessages, msgObj])
+    socket.on('private message', (msgObj) => {
+      setPrivateMessages(prevMessages => [...prevMessages, msgObj])
+    })
+
+    socket.on('public message', (msgObj) => {
+      setPublicMessages(prevMessages => [...prevMessages, msgObj])
     })
   }, [])
  
@@ -79,8 +95,12 @@ export const App = () => {
     socket.emit('chat message', { message: msgToSend, nickname: nickname } )
   }
 
-  const MessagesList = () => {
-    return messages.map(msg => (<Message key={uuidv4()} msgObj={msg} />))
+  const PrivateMessagesList = () => {
+    return privateMessages.map(msg => (<Message key={uuidv4()} msgObj={msg} />))
+  }
+
+  const PublicMessagesList = () => {
+    return publicMessages.map(msg => (<Message key={uuidv4()} msgObj={msg} />))
   }
   
   return (
@@ -91,11 +111,15 @@ export const App = () => {
         <Heading>Public</Heading>
       </div>
       <div className="chats">
-        <Container p={4} bg='muted' sx={{ mt: '10px'}} id="messagesBox">
-          <MessagesList />
+        <Container bg='muted' sx={{ b: '10px', m: '10px', overflow: 'scroll', height: '100%'}} id="privateMessagesBox">
+          <PrivateMessagesList />
         </Container>
 
-        <ChatInput chatType="privateChat" inputType="privateInput" changeHandler={setPrivateMsg} clickHandler={sendMessage}/>
+        <Container bg='muted' sx={{ b: '10px', m: '10px', overflow: 'scroll', height: '100%'}} id="publicMessagesBox">
+          <PublicMessagesList />
+        </Container>
+
+        <ChatInput chatType="privateChat" inputType="privateInput" changeHandler={setPrivateMsg} clickHandler={sendMessage} />
         <ChatInput chatType="allChat" inputType="allInput" clickHandler={sendMessage} changeHandler={setPublicMsg} />
       </div>
     </div>

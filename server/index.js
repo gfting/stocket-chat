@@ -79,8 +79,8 @@ io.on('connection', (socket) => {
 
         socketsToUsers[socket.id] = msg.nickname
 
-        console.log(`Message: ${msg.message}`)
-        io.emit('chat message', msg);
+        console.log(`Public message: ${msg.message}`)
+        io.emit('public message', msg);
 
         // Handle ticker logic
         const tickerQueries = findTickerSymbols(msg.message)
