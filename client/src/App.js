@@ -5,6 +5,7 @@ import TextField from '@material-ui/core/TextField'
 import {Input, Box} from 'theme-ui'
 import { Button, Heading } from 'theme-ui'
 import {useEffect, useState} from 'react'
+import { v4 as uuidv4 } from 'uuid';
 
 import useSocket from 'use-socket.io-client';
 
@@ -75,7 +76,7 @@ export const App = () => {
   }
 
   const MessagesList = () => {
-    return messages.map(msg => (<Message msgObj={msg} />))
+    return messages.map(msg => (<Message key={uuidv4()} msgObj={msg} />))
   }
   
   return (
