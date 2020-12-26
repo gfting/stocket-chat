@@ -2,7 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import {io} from 'socket.io-client';
 import TextField from '@material-ui/core/TextField'
-import {Input, Box} from 'theme-ui'
+import {Input, Container} from 'theme-ui'
 import { Button, Heading } from 'theme-ui'
 import {useEffect, useState} from 'react'
 import { v4 as uuidv4 } from 'uuid';
@@ -39,11 +39,15 @@ export const ChatInput = ({chatType, inputType, clickHandler, changeHandler}) =>
   )
 }
 
+/**
+ * Handles rendering a single message
+ * 
+ * @param {Object} msgObj – object of format { message: '', nickname: '' } 
+ */
 const Message = ({msgObj}) => {
-  console.log(msgObj.message)
   return (
-    <div id={msgObj.message}>
-      {msgObj.message}
+    <div>
+      {`${msgObj.nickname}: ${msgObj.message}`}
     </div>
   )
 }
@@ -87,9 +91,9 @@ export const App = () => {
         <Heading>Public</Heading>
       </div>
       <div className="chats">
-        <Box id="messagesBox">
+        <Container p={4} bg='muted' sx={{ mt: '10px'}} id="messagesBox">
           <MessagesList />
-        </Box>
+        </Container>
 
         <ChatInput chatType="privateChat" inputType="privateInput" changeHandler={setPrivateMsg} clickHandler={sendMessage}/>
         <ChatInput chatType="allChat" inputType="allInput" clickHandler={sendMessage} changeHandler={setPublicMsg} />
