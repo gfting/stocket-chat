@@ -53,7 +53,7 @@ export const App = () => {
   const [privateMsg, setPrivateMsg] = useState('');
   const [publicMsg, setPublicMsg] = useState('');
   const [socket] = useSocket(REACT_APP_SERVER_URL);
-  const messages = []
+  const [messages, setMessages] = useState([])
 
   // const [socket, setSocket] = useState(io(REACT_APP_SERVER_URL));
 
@@ -61,26 +61,22 @@ export const App = () => {
     socket.connect();
 
     socket.on('connect', () => {
-      console.log(socket.id); // 'G5p5...'
+      console.log(`Connected; socket ID: ${socket.id}`); // 'G5p5...'
     });
 
-    socket.emit("hi", { name: "John" });
-  }, [])
-
-  useEffect(() => {
-    
-    socket.on('chat message', (msg) => {
-      messages.push(msg)
+    socket.on('chat message', (msgObj) => {
+      setMessages(prevMessages => [...prevMessages, msgObj])
     })
-  })
-
+  }, [])
+ 
   const sendMessage = (chatType) => {
-    
-    const msgToSend = privateMsg ? chatType === "privateChat" : publicMsg;
+    const msgToSend = chatType === "privateChat" ? privateMsg : publicMsg;
     socket.emit('chat message', { message: msgToSend, nickname: nickname } )
   }
 
-  const MessagesList = () => (messages.map(msg => (<Message msgObj={msg} />)))
+  const MessagesList = () => {
+    return messages.map(msg => (<Message msgObj={msg} />))
+  }
   
   return (
     <div className="container">
