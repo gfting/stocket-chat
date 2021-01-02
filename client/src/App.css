@@ -105,6 +105,7 @@ form button {
 .chats {
   display: grid;
   flex-grow: 2;
+  overflow: auto;
   grid-template-columns: 50% 50%;
   grid-template-rows: 90% 10%;
   grid-template-areas: 
@@ -116,4 +117,12 @@ form button {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+#privateMessagesBox {
+  grid-area: privateChat;
+}
+
+#publicMessagesBox {
+  grid-area: allChat;
 }

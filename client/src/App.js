@@ -115,7 +115,7 @@ export const App = () => {
           <PrivateMessagesList />
         </Container>
 
-        <Container bg='muted' sx={{ b: '10px', m: '10px', overflow: 'scroll', height: '100%'}} id="publicMessagesBox">
+        <Container bg='muted' sx={{ border: '10px', m: '10px', overflow: 'scroll', height: '100%'}} id="publicMessagesBox">
           <PublicMessagesList />
         </Container>
 
