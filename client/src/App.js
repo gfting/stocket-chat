@@ -1,8 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import {io} from 'socket.io-client';
-import TextField from '@material-ui/core/TextField'
-import { Input, Container, Button, Heading, Text } from 'theme-ui'
+import { Input, Container, Button, Heading, Text, Select } from 'theme-ui'
 import {useEffect, useState} from 'react'
 import { v4 as uuidv4 } from 'uuid';
 
@@ -66,11 +65,12 @@ const Message = ({msgObj}) => {
 export const App = () => {
   const [id, setId] = useState('');
   const [nickname, setNickname] = useState('');
+  const [nicknames, setNicknames] = useState([]);
   const [privateMsg, setPrivateMsg] = useState('');
   const [publicMsg, setPublicMsg] = useState('');
+  const [privateMessages, setPrivateMessages] = useState([]);
+  const [publicMessages, setPublicMessages] = useState([]);
   const [socket] = useSocket(REACT_APP_SERVER_URL);
-  const [privateMessages, setPrivateMessages] = useState([])
-  const [publicMessages, setPublicMessages] = useState([])
 
   // const [socket, setSocket] = useState(io(REACT_APP_SERVER_URL));
 
@@ -88,10 +88,19 @@ export const App = () => {
     socket.on('public message', (msgObj) => {
       setPublicMessages(prevMessages => [...prevMessages, msgObj])
     })
+
+    socket.on('nicknameList', (users) => {
+      setNicknames(users)
+    })
   }, [])
  
   const sendMessage = (chatType) => {
     const msgToSend = chatType === "privateChat" ? privateMsg : publicMsg;
+    if (chatType === "privateChat") {
+      const recipient = document.getElementById("privateMsgRecipient").value;
+      socket.emit('private message', {message: msgToSend, nickname: nickname, recipient: recipient})
+      return;
+    }
     socket.emit('chat message', { message: msgToSend, nickname: nickname } )
   }
 
@@ -102,14 +111,29 @@ export const App = () => {
   const PublicMessagesList = () => {
     return publicMessages.map(msg => (<Message key={uuidv4()} msgObj={msg} />))
   }
+
+  const NicknameList = () => {
+    return (
+      <div className="header chatInput" style={{marginTop: "15px", justifyContent: "space-evenly", height: "auto"}}>
+        <Select id="privateMsgRecipient">
+          {nicknames.map(val => (<option key={val}>{val}</option> ))}
+        </Select>
+        <Button onClick={(e) => {
+          socket.emit('getNicknames')
+        }}>Refresh Nicknames</Button>
+      </div>
+    )
+  }
   
   return (
     <div className="container">
       <div className="header chatInput" style={{marginTop: "15px", justifyContent: "space-evenly", height: "auto"}}>
-        <Heading>Private</Heading>
+        <Heading>Private Chat</Heading>
         <Input style={{width: "20%"}} onChange={(e) => {setNickname(e.target.value)}} placeholder="Enter nickname"/>
-        <Heading>Public</Heading>
+        <Heading>Public Chat</Heading>
       </div>
+
+        <NicknameList />
       <div className="chats">
         <Container bg='muted' sx={{ b: '10px', m: '10px', overflow: 'scroll', height: '100%'}} id="privateMessagesBox">
           <PrivateMessagesList />

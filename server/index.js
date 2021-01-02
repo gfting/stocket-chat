@@ -92,6 +92,26 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('private message', (msg) => {
+        const recipient = msg.recipient
+        
+        // Checks if exists in DB, sends it as a private message
+        if (recipient in users) {
+            io.to(users[recipient]).emit('private message', msg);
+
+            // Send it back to itself
+            // TODO: This is hacky, needs to be refactored if actual project 
+            io.to(socket.id).emit('private message', msg)
+        } else {
+            const errorObject = {nickname: msg.nickname, message: `${recipient} is not a valid username.`}
+            io.to(socket.id).emit('private message', errorObject)
+        }
+    });
+
+    socket.on('getNicknames', () => {
+        io.emit('nicknameList', Object.keys(users))
+    })
+
     socket.on('hi', (msg) => {
         console.log(msg)
     })
