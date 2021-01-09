@@ -1,6 +1,4 @@
-import logo from './logo.svg';
 import './App.css';
-import {io} from 'socket.io-client';
 import { Input, Container, Button, Heading, Text, Select } from 'theme-ui'
 import { useEffect, useState, useCallback } from 'react'
 import { v4 as uuidv4 } from 'uuid';
@@ -63,7 +61,7 @@ const Message = ({msgObj}) => {
 }
 
 export const App = () => {
-  const [id, setId] = useState('');
+  // const [id, setId] = useState('');
   const [nickname, setNickname] = useState('');
   const [nicknames, setNicknames] = useState([]);
   const [privateMsg, setPrivateMsg] = useState('');
@@ -92,7 +90,7 @@ export const App = () => {
     socket.on('nicknameList', (users) => {
       setNicknames(users)
     })
-  }, [])
+  }, [socket])
  
   const sendMessage = (chatType) => {
     const msgToSend = chatType === "privateChat" ? privateMsg : publicMsg;
