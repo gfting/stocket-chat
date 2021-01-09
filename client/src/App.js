@@ -2,7 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import {io} from 'socket.io-client';
 import { Input, Container, Button, Heading, Text, Select } from 'theme-ui'
-import {useEffect, useState} from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { v4 as uuidv4 } from 'uuid';
 
 import useSocket from 'use-socket.io-client';
@@ -112,7 +112,10 @@ export const App = () => {
     return publicMessages.map(msg => (<Message key={uuidv4()} msgObj={msg} />))
   }
 
-  const NicknameList = () => {
+  /**
+   * Prevent re-rendering of nicknames
+   */
+  const NicknameList = useCallback(() => {
     return (
       <div className="header chatInput" style={{marginTop: "15px", justifyContent: "space-evenly", height: "auto"}}>
         <Select id="privateMsgRecipient">
@@ -123,7 +126,7 @@ export const App = () => {
         }}>Refresh Nicknames</Button>
       </div>
     )
-  }
+  }, [socket, nicknames])
   
   return (
     <div className="container">
