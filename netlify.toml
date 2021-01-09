@@ -1,0 +1,4 @@
+[build]
+  ignore = "git diff --quiet HEAD^ HEAD"
+  base = "client"
+  publish = "build"
