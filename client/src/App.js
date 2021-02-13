@@ -33,10 +33,11 @@ export const ChatInput = ({chatType, inputType, clickHandler, changeHandler}) =>
         changeHandler(e.target.value)}
       }
       onKeyDown={(e) => {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && e.target.value !== '') {
           clickHandler(chatType)
           // Reset message input to empty string
           changeHandler('')
+          e.target.value = ''
         }}
       }
       />
