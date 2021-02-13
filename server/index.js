@@ -31,6 +31,12 @@ const tickerData = {
     AMZN: 1300.00
 }
 
+// TODO: should probably also clean up the in-memory DB after disconnect, and not duplicate
+function addNicknameToDb(users, nickname, socketId, socketsToUsers) {
+    users[nickname] = socketId
+    socketsToUsers[socketId] = nickname
+}
+
 // Make a mock database of users
 const users = {}
 const socketsToUsers = {}
@@ -75,9 +81,7 @@ io.on('connection', (socket) => {
 
         // Capture and store nickname
         console.log(`Nickname: ${msg.nickname}`)
-        users[msg.nickname] = socket.id
-
-        socketsToUsers[socket.id] = msg.nickname
+        addNicknameToDb(users, msg.nickname, socket.id, socketsToUsers)
 
         console.log(`Public message: ${msg.message}`)
         io.emit('public message', msg);
@@ -98,6 +102,7 @@ io.on('connection', (socket) => {
         // Checks if exists in DB, sends it as a private message
         if (recipient in users) {
             io.to(users[recipient]).emit('private message', msg);
+            addNicknameToDb(users, msg.nickname, socket.id, socketsToUsers)
 
             // Send it back to itself
             // TODO: This is hacky, needs to be refactored if actual project 
