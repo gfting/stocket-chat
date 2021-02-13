@@ -29,10 +29,14 @@ export const ChatInput = ({chatType, inputType, clickHandler, changeHandler}) =>
       <Input 
       style={{width: "80%", marginRight: "10px"}}
       placeholder="Type message here..."
-      onChange={(e) => {changeHandler(e.target.value)}}
+      onChange={(e) => {
+        changeHandler(e.target.value)}
+      }
       onKeyDown={(e) => {
         if (e.key === 'Enter') {
           clickHandler(chatType)
+          // Reset message input to empty string
+          changeHandler('')
         }}
       }
       />
@@ -91,7 +95,7 @@ export const App = () => {
       setNicknames(users)
     })
   }, [socket])
- 
+
   const sendMessage = (chatType) => {
     const msgToSend = chatType === "privateChat" ? privateMsg : publicMsg;
     if (chatType === "privateChat") {
