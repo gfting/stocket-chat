@@ -65,7 +65,7 @@ io.on('connection', (socket) => {
             const msgArr = msg.message.split(' ')
             const username = msgArr[0].substr(1, msgArr[0].length - 1)
             console.log(users)
-            msg[username] = username;
+            msg.username = username;
             // Checks if exists in DB, sends it as a private message
             if (username in users) {
                 io.to(users[username]).emit('private message', msg);

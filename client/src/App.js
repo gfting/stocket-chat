@@ -52,9 +52,9 @@ export const ChatInput = ({chatType, inputType, clickHandler, changeHandler}) =>
  * @param {Object} msgObj – object of format { message: '', nickname: '' } 
  */
 const Message = ({msgObj}) => {
-  let messageText = msgObj.message;
+  let sender = msgObj.nickname;
   if (msgObj.username) {
-    messageText += ` to ${msgObj.username}`
+    sender += ` to ${msgObj.username}`
   }
   return (
     <div>
@@ -62,9 +62,9 @@ const Message = ({msgObj}) => {
         sx={{
           fontWeight: 'bold',
         }}>
-        {msgObj.nickname}
+        {sender}
       </Text>
-      <Text>{messageText}</Text>
+      <Text>{msgObj.message}</Text>
     </div>
   )
 }
